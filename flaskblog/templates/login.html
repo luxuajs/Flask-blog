@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content -%} 
+
+  {{ super() }}
+  <div class="container">
+    <h1>Login page</h1>
+
+    <div class="content-section">
+      <form action="{{ url_for('login')}}" method="POST" novalidate>
+        {% if form.csrf_token.errors %}
+          <div class="alert alert-danger">
+            {% for error in form.csrf_token.errors %}
+              <span> {{ error }} </span>
+            {% endfor %}
+          </div>
+        {% else %}
+          {{ form.hidden_tag() }} <!-- I've put this for use CSRF protection, REMEMBER: <<< just put it >>> -->
+        {% endif %}
+        <fieldset class="form-group">
+          <legend class="border-bottom mb-4">Join Today</legend>
+          <div class="form-group">
+            {{ form.email.label(class="form-control-label")}}
+            {% if form.email.errors %}
+              {{ form.email(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.email.errors %} 
+                  {% if error == "This email has not been registered, please register first" %} 
+                    <span> {{ error }}</span>
+                    <a href="{{ url_for('register')}}">Sign up now</a>
+                  {% else %} 
+                    <span> {{ error }}</span>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.email(class="form-control form-control-lg") }}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            {{ form.password.label(class="form-control-label")}}
+            {% if form.password.errors %}
+              {{ form.password(class="form-control form-control-lg is-invalid") }}
+              <div class="invalid-feedback">
+                {% for error in form.password.errors %} 
+                  <span> {{ error }}</span>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ form.password(class="form-control form-control-lg") }}
+            {% endif %}
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              {{ form.remember(class="form-check-input") }}
+              {{ form.remember.label(class="form-check-label") }}
+            </div>
+          </div>
+          <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info")}}
+          </div>
+
+          <small class="text-muted ml-2">
+            <a href="#">Forgot password?</a>
+          </small>
+        </fieldset>
+      </form>
+    </div>
+
+    <div class="border-top pt-3">
+      <small class="text-muted"> 
+        Don't have account?
+      </small>
+      <a class="ml-2" href="{{ url_for('register') }}">Sign up now</a>
+    </div>
+
+  </div>
+{%- endblock %}

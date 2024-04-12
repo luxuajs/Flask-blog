@@ -1,0 +1,8 @@
+bcrytp==4.1.2
+flask-Bcrypt==1.0.1
+flask-Login==0.6.3
+flask-slqalchemy
+flask-wtf
+wtforms
+sqlalchemy
+email-validator
