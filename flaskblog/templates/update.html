@@ -1,2 +1,64 @@
-{{ extends "index.html" }}
+{% extends "layout.html" %}
 
+{% block content %}
+
+  <div class="content-section">
+    <form action="{{ url_for('update_post', post_id=post.id )}}" method="POST" novalidate>
+
+      {% if form.csrf_token.errors %}
+        <div class="alert alert-danger">
+          {% for error in form.csrf_token.errors %}
+            <span> {{ error }} </span>
+          {% endfor %}
+        </div>
+      {% else %}
+        {{ form.hidden_tag() }} <!-- I've put this for use CSRF protection, REMEMBER: <<< just put it >>> -->
+      {% endif %}
+
+      <fieldset class="form-group">
+        <legend class="border-bottom mb-4">{{ legend }}</legend>
+        <div class="form-group">
+          {{ form.title.label(class="form-control-label")}}
+          {% if form.title.errors %}
+            {{ form.title(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.title.errors %} 
+                {% if error == "This title has not been registered, please register first" %} 
+                  <span> {{ error }}</span>
+                  <a href="{{ url_for('register')}}">Sign up now</a>
+                {% else %} 
+                  <span> {{ error }}</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.title(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+        <div class="form-group">
+          {{ form.content.label(class="form-control-label")}}
+          {% if form.content.errors %}
+            {{ form.content(class="form-control form-control-lg is-invalid") }}
+            <div class="invalid-feedback">
+              {% for error in form.content.errors %} 
+                {% if error == "This title has not been registered, please register first" %} 
+                  <span> {{ error }}</span>
+                  <a href="{{ url_for('register')}}">Sign up now</a>
+                {% else %} 
+                  <span> {{ error }}</span>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            {{ form.content(class="form-control form-control-lg") }}
+          {% endif %}
+        </div>
+          {{ form.submit(class="btn btn-outline-info")}}
+        <div>
+
+        </div>
+      </fieldset>
+    </form>
+  </div>
+
+{% endblock %}

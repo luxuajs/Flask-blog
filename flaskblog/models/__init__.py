@@ -51,21 +51,3 @@ class Post(db.Model):
   def __repr__(self):
     return f"Post({self.title},{self.date_posted})"
   
-
-
-class UpdatePostForm(db.Model):
-  id = db.Column(db.Integer, primary_key=True)
-  title = db.Column(db.String(100), nullable=False)
-  date_posted = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
-  content = db.Column(db.Text, nullable=False)
-
-  # Aquí creamos la columna que realiza la relación entre las tablas, es importante notar que 
-  # a la hora de usar el d.ForeignKey se llama a la tabla user que es de la clase User, pero por
-  # defecto el nombre de la clase User se pasa a lowecase, es decir, user y para acceder a una columna
-  # en este caso a la del id pues se usa el punto . ejemplo: user.id
-  user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-
-
-  def __repr__(self):
-    return f"UpdatePostForm({self.title},{self.date_posted})"
-  
