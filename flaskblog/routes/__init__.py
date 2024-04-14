@@ -1,11 +1,18 @@
 import secrets, os
-from flask import render_template, url_for, redirect, flash, request, session
+from flask import render_template, url_for, redirect, flash, request, session, abort
 # from sqlalchemy import text
 from PIL import Image
-from flaskblog.models import User
+from flaskblog.models import User, Post
 from flaskblog.forms import *
 from flaskblog import app, db, bcrypt
 from flask_login import login_user, logout_user, login_required, current_user
+
+
+@app.errorhandler(403)
+def error_403(err):
+  return render_template("error_403.html"), 403
+
+
 
 # ENDPOINTS
 @app.route("/")
@@ -101,7 +108,7 @@ def account():
     form.username.data = current_user.username
     form.email.data = current_user.email
 
-  image_file = url_for('static', filename="imgs/profile_pis") + current_user.image_file
+  image_file = url_for('static', filename="imgs/profile_pics/") + current_user.image_file
   return render_template("account.html", title="Account", image_file=image_file, form=form)
 
 
@@ -115,34 +122,53 @@ def new_post():
     post = Post(title=form.title.data, content=form.content.data, author=current_user)
     db.session.add(post)
     db.session.commit()
-
     return redirect(url_for('home'))
-  return render_template("create_post.html", title="New Post", form=form)
+  
+  return render_template("create_post.html", title="New Post", form=form, legend="New Post")
 
 
-@app.route("/post/<int:id>")
-def post(id):
-  post = Post.query.get_or_404(id)
-  return render_template('post.html',post=post)
+@app.route("/post/<int:post_id>", methods=["GET","POST"])
+def post(post_id):
+  post = Post.query.get_or_404(post_id)
+  return render_template('post.html', title=post.title, post=post)
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-# QUEDAMOS AQUÍ PARA RESOLVER EL PROBLEMA DE ACTUALIZAR UNA PUBLICACIÓN
-# DEBEMOS TENER EN CUENTA QUE TAMBIEN PARA PODER ACTUALIZAR UNA PUBLICACIÓN
-# EL USUARIO QUE VA ACTUALIZAR DEBE SER EL MISMO QUE ESTA EN SESIÓN ACTIVA
-# OJITO CON ESO OjO
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-@app.route("/update/post/<int:id>", methods=["POST","GET"])
+@app.route("/post/<int:post_id>/update", methods=["POST","GET"])
 @login_required
-def update_post(id):
+def update_post(post_id):
+  post = Post.query.get_or_404(post_id)
+  if post.author != current_user:
+    abort(403)
 
-  form = UpdatePostForm()
-  post = Post.query.get_or_404(id)
+  form = PostForm()
   if form.validate_on_submit():
-    post.title = form.title
-    post.date_posted = form.date_posted
-    post.co
-  return render_template('update.html', form=form)
+    post.title = form.title.data
+    post.content = form.content.data
+    db.session.commit()
+    flash("Your post has been update!", "success")
+    return redirect(url_for("post", post_id=post.id))
+  
+  elif request.method == "GET":
+    form.title.data = post.title
+    form.content.data = post.content
+  return render_template('update.html', form=form, title="Update Post", post=post, legend="Update Post")
+
+
+@app.route("/post/<int:post_id>/delete", methods=["POST"])
+def delete_post(post_id):
+  post = Post.query.get_or_404(post_id)
+
+  if(current_user != post.author):
+    abort(403)
+
+  db.session.delete(post)
+  db.session.commit()
+  flash('Your post has been deleted!', 'success')
+  return redirect(url_for("home"))
+
+
 
 @app.route("/logout")
 def logout():

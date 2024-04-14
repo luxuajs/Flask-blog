@@ -57,18 +57,6 @@ class UpdateAccountForm(FlaskForm):
       
 
 class PostForm(FlaskForm):
-  # author = StringField("Author", validators=[DataRequired("Please, enter an author"), Length(min=3, max=50, message="The author name must be between 2 and 30 character.")])
-  title = StringField("Title", validators=[DataRequired("Please, enter a title"), Length(min=3, max=50, message="Your title must be between 3 and 50 character.")])
-  content = TextAreaField("Content", validators=[DataRequired("Please, enter a content"), Length(min=2, message="Your content almost must has 2 character")])
-  submit = SubmitField("Post")
-
-  # def validate_title(form, field):
-  #   title = field.data
-  #   if Post.query
-
-
-class UpdatePostForm(FlaskForm):
-  # author = StringField("Author", validators=[DataRequired("Please, enter an author"), Length(min=3, max=50, message="The author name must be between 2 and 30 character.")])
   title = StringField("Title", validators=[DataRequired("Please, enter a title"), Length(min=3, max=50, message="Your title must be between 3 and 50 character.")])
   content = TextAreaField("Content", validators=[DataRequired("Please, enter a content"), Length(min=2, message="Your content almost must has 2 character")])
   submit = SubmitField("Post")
