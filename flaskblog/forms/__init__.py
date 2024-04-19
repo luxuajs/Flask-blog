@@ -4,7 +4,7 @@ from flask_login import current_user
 from flaskblog.models import User, Post
 from wtforms import StringField, SubmitField, EmailField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, InputRequired, Email, EqualTo, ValidationError
-from flaskblog.forms.custom_validators import verify_password, validate_username_reg, validate_email_reg
+from flaskblog.forms.custom_validators import verify_password, validate_username_reg, validate_email_reg, validate_free_email
 
 # The min and max length for password
 min=8
@@ -60,3 +60,19 @@ class PostForm(FlaskForm):
   title = StringField("Title", validators=[DataRequired("Please, enter a title"), Length(min=3, max=50, message="Your title must be between 3 and 50 character.")])
   content = TextAreaField("Content", validators=[DataRequired("Please, enter a content"), Length(min=2, message="Your content almost must has 2 character")])
   submit = SubmitField("Post")
+
+
+
+class RequestResetPasswordForm(FlaskForm):
+  email = EmailField("Email", validators=[DataRequired("Please, enter a email"), Email(message="Invalid email, check and try again"), validate_free_email])
+  submit = SubmitField("Request reset password")
+
+
+class ResetPasswordForm(FlaskForm):
+  password = PasswordField("Password", 
+                           validators=[DataRequired(message="Please enter a password"),Length(min=min, max=max, 
+                                              message=f"Remind the length of your \
+                                              password must be among {min} and {max} characters"),
+                                              verify_password])
+  confirm = PasswordField("Confirm password", validators=[InputRequired(message="Please confirm your password"),EqualTo('password', message="Passwords must match")])
+  submit = SubmitField("Reset password")

@@ -1,4 +1,6 @@
 from flaskblog import db, login_manager
+from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from flaskblog import app 
 from datetime import datetime
 from flask_login import UserMixin
 
@@ -22,6 +24,30 @@ class User(db.Model, UserMixin):
   email = db.Column(db.String(120), unique=True, nullable=False)
   image_file = db.Column(db.String(20), nullable=False, default="default.jpg")
   password = db.Column(db.String(60), nullable=False)
+
+  # Creamos unas funciones para crear tokens de reseteo de contraseña
+  # y tambien para confirmarlos
+
+  # Reset token
+  def get_reset_token(self, expirec_sec=1800):
+    s = Serializer(app.config["SECRET_KEY"], expirec_sec)
+    return s.dumps({"user_id":self.id}).decode("utf-8")
+
+  # Verify token
+  @staticmethod # Este decorador es para crear un metodo estatico y ya sabemos para que es
+  def verify_token(token):
+    s = Serializer(app.config["SECRET_KEY"])
+
+    try:
+      user_id = s.loads(token)["user_id"]
+    except:
+      return None
+  
+    return User.query.get(user_id)
+
+
+
+
 
   # Definimos una relación entre la tabla User y la tabla Post, con la línea de abajo
   # creamos esta realción, tener en cuenta que el argumento backref es similarl a crear

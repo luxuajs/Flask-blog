@@ -24,3 +24,7 @@ def validate_email_reg(form, field):
   if User.query.filter_by(email=email).first():
     raise ValidationError("This emial is taken, please choose other one.")
 
+def validate_free_email(form, field):
+  email = field.data
+  if not User.query.filter_by(email=email).first():
+    raise ValidationError("This email doesn't have an account, please register first.")
